@@ -1,0 +1,142 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="https://rawgit.com/Turbo87/leaflet-sidebar/master/src/L.Control.Sidebar.js"></script>
+    <link rel="stylesheet" href="https://rawgit.com/Turbo87/leaflet-sidebar/master/src/L.Control.Sidebar.css" />
+    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    
+    <style>
+      #map {
+        width: 100%;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sidebar">
+      <button>Close</button>
+      <div class="sidebar_content"></div>
+    </div>
+    <div id='map'></div>
+    <button id="customButton">Show in DIV</button>
+    <div style="display: none" class="custom-div">
+
+  <script>
+
+  var southWest = L.latLng(0, -15),
+      northEast = L.latLng(40.774, 74.125),
+      bounds = L.latLngBounds(southWest, northEast);
+
+  var map = L.map("map").setView([60, 25], 2);
+
+  var sidebar = L.control.sidebar('sidebar', {
+            closeButton: false,
+            position: 'left'
+        });
+  map.addControl(sidebar)
+
+  var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  var esri = L.esri.featureLayer({
+           url: "https://svalbox.unis.no/arcgis/rest/services/dom/DOM/MapServer/1",
+           style: function () {
+             return { color: "#70ca49", weight: 2 };
+           },
+          /* onEachFeature: function (feature, layer) {
+            console.log(feature.properties.publ_sketchfab_id)
+          var popupContent = "<iframe src=https://sketchfab.com/models/" +
+              feature.properties.publ_sketchfab_id + //
+              '/embed?autostart=1&ui_inspector=0 width="100%" height="100%" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe></center>'
+          if (feature.properties && feature.properties.popupContent) {
+              popupContent += feature.properties.popupContent;
+          }
+              //layer.bindPopup(popupContent);
+              $('#sidebar>.sidebar_content').html(popupContent);
+              $('.custom-div').html(popupContent);
+         }*/}).addTo(map);
+
+  var geojsonMarkerOptions = {
+    radius: 100,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 0.5,
+    fillOpacity: 0.8
+  };
+
+// example from here> https://jsbin.com/kajocuxowi/edit?html,js,output
+
+  function openSidebar(e) {
+        sidebar.toggle();
+        sidebar.setContent('<div id="sidebarin"><h2>' + e.target.feature.properties.description + '</h2></div>');
+    }
+
+  var myRequest = "https://wms.qgiscloud.com/peterbetlem/rnd?service=WFS&request=GetFeature";
+  var outputFormat = "outputformat=geojson";
+  var areasRequest = myRequest + "&typename=areas&" + outputFormat; 
+  var featuresData = [];
+
+
+  function onEachFeature (feature, layer) {
+    var popupContent = "<p>The <b>" +
+          feature.properties.qc_id + "</b> play here,</br> They are in the " +
+          feature.properties.description + "</br>";
+
+          $('.test').innterHTML = feature.properties.description
+    console.log(sidebar._div)
+  }
+
+ // help from: https://gis.stackexchange.com/questions/335598/leaflet-search-plugin-for-getjson-function
+  var datalayer = L.geoJson(null, {
+
+      pointToLayer: function(feature, latlng) {
+
+          return L.circleMarker(latlng, {
+          radius:6,
+          opacity: .5,
+          //color: "#000",
+          //color:getColor(feature.properties.League),
+          //fillColor:  getColor(feature.properties.League),
+          fillOpacity: 0.8
+
+          });  //.bindTooltip(feature.properties.Name);
+      },
+      onEachFeature: onEachFeature
+      });
+
+  $.getJSON(areasRequest, function(data){
+  // L.geoJson function is used to parse geojson file and load on to map
+  datalayer.addData(data).addTo(map);
+  console.log(data)
+  })
+  .success(function(){
+    console.log("Successfully retrieved GIS objects.")
+  })
+  .fail(function(){
+    console.log("Failed to retrieve GIS objects.")
+  })
+
+  /*esri.on('click', function() {
+    sidebar.toggle();
+  });*/
+  datalayer.on('click', function() {
+    sidebar.toggle();
+  });
+  $('#sidebar>button').on('click', function () {
+  sidebar.toggle();
+  });
+
+  $('#customButton').on('click', function() {
+    $('.custom-div').toggle();
+  });
+
+
+</script>
+
+</body>
+</html>
