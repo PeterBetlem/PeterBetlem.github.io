@@ -10,6 +10,8 @@
         crossorigin=""/>
 
     <link rel="stylesheet" href="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/css/leaflet-sidebar.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
 
     <style>
         body {
@@ -43,7 +45,8 @@
     <script src="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/js/leaflet-sidebar.js"></script>
     <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/citeproc-js-es5@1.0.4/dist/citeproc.min.js"></script>
-    <script src="https://unpkg.com/esri-leaflet/dist/esri-leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" crossorigin=""></script>
+    
 
     <!-- optionally define the sidebar content via HTML markup -->
     <div id="sidebar" class="leaflet-sidebar collapsed">
@@ -57,6 +60,7 @@
                 <li><a href="#events" role="tab"><i class="fa-solid fa-street-view"></i></a></li>
                 <li><a href="#publications" role="tab"><i class="fa-solid fa-file-contract"></i></a></li>
                 <li><a href="#teaching" role="tab"><i class="fa-solid fa-person-chalkboard"></i></a></li>
+                <li><a href="#grants" role="tab"><i class="fa-solid fa-magnifying-glass-dollar"></i></a></li>
                 <li><a href="#contact" role="tab"><i class="fa fa-address-card"></i></a></li>
             </ul>
 
@@ -93,13 +97,16 @@
                     Projects
                     <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h1>
+                <div id="projects-content-header">
+                </div>
+                <hr>
                 <div id="projects-content">
                 </div>
             </div>
 
             <div class="leaflet-sidebar-pane" id="events">
                 <h1 class="leaflet-sidebar-header">
-                    Events and localities
+                    Map events
                     <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h1>
                 <div id="events-content">
@@ -135,6 +142,15 @@
 
                 </div>
             </div>
+
+            <div class="leaflet-sidebar-pane" id="grants">
+                <h1 class="leaflet-sidebar-header">
+                    Grants & support
+                    <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h1>
+                <div id="grants-content">
+                </div>
+            </div>
             
             <div class="leaflet-sidebar-pane" id="contact">
                 <h1 class="leaflet-sidebar-header">
@@ -154,7 +170,7 @@
 
     <script>
         $( "#home-content" ).load( "./pages/home.html" );
-        $( "#projects-content" ).load( "./pages/projects.html" );
+        $( "#projects-content-header" ).load( "./pages/projects.html" );
         $( "#contact-content" ).load( "./pages/contact.html" );
     </script>
 
@@ -216,10 +232,45 @@
             console.log("Successfully retrieved GIS objects.")
         })
         .fail(function(){
-            alert('Failed to access GIS data')
-            console.log("Failed to retrieve GIS objects.")
+            alert('Failed to access Svalbox GIS data')
+            console.log("Failed to retrieve Svalbox GIS objects.")
         })
+        
+        var img360_markers = L.markerClusterGroup({
+            spiderfyOnMaxZoom: false,
+            showCoverageOnHover: false
+            }); 
+        const img360_request = "https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
+        const img360_layer = L.geoJson(null, {
+            pointToLayer: function(feature, latlng) {
 
+                return L.circleMarker(latlng, {
+                radius:3,
+                opacity: .5,
+                color: "yellow",
+                //color:getColor(feature.properties.League),
+                //fillColor:  getColor(feature.properties.League),
+                fillOpacity: 0.8
+
+                });  //.bindTooltip(feature.properties.Name);
+                },
+            onEachFeature: onEachFeature,
+            id: "img360"
+            }
+        )
+        $.getJSON(img360_request, function(data){
+        // L.geoJson function is used to parse geojson file and load on to map
+        img360_layer.addData(data)
+        // img360_markers.addLayer(img360_layer)
+
+        })
+        .success(function(){
+            console.log("Successfully retrieved GIS objects.")
+        })
+        .fail(function(){
+            alert('Failed to access Img360 GIS data')
+            console.log("Failed to retrieve Img360 GIS objects.")
+        })
 
         var geojsonMarkerOptions = {
             radius: 100,
@@ -237,6 +288,9 @@
 
         function onEachFeature (feature, layer) {
             layer.on("click", function(e){
+                console.log(layer)
+                console.log(img360_markers._leaflet_id.toString())
+                console.log(img360_layer._leaflet_id.toString())
                 switch (Object.keys(layer._eventParents)[0].toString()) {
                     case datalayer._leaflet_id.toString():
                         featureDetails = document.getElementById("projects-content");
@@ -245,8 +299,14 @@
                         break
                     case doms_layer._leaflet_id.toString():
                         featureDetails = document.getElementById("events-content");
-                        console.log(feature.properties.publ_sketchfab_id)
                         featureDetails.innerHTML = '<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/' + feature.properties.publ_sketchfab_id + '/embed"></iframe></div>'
+                        sidebar.open("events")
+                        break
+                    case img360_layer._leaflet_id.toString():
+                        console.log(e)
+                        featureDetails = document.getElementById("events-content");
+                        featureDetails.innerHTML = '<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
+                             ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+feature.properties.api_link+'&autoLoad=false"></iframe></div>'
                         sidebar.open("events")
                         break
                     }
@@ -286,9 +346,11 @@
             console.log("Successfully retrieved GIS objects.")
         })
         .fail(function(){
-            alert('Failed to access GIS data')
-            console.log("Failed to retrieve GIS objects.")
+            alert('Failed to access project GIS data')
+            console.log("Failed to retrieve project GIS objects.")
         })
+
+        
 
 
 
@@ -307,6 +369,12 @@
                     title: "DOMs",
                 },
                 {
+                    layer: img360_layer,
+                    eventType: "img360",
+                    overlayLayerControl: true,
+                    title: "Photospheres",
+                },
+                {
                     layer: datalayer,
                     eventType: "projects",
                     overlayLayerControl: true,
@@ -316,16 +384,16 @@
 
         mapLayers.forEach((layerObj) => {
             if (layerObj.defaultAdd) {
-                console.log(layerObj)
+                //console.log(layerObj)
             }
 
             if (layerObj.eventType !== "undefined") {
-                console.log(layerObj)
+                //console.log(layerObj)
                 layerObj.layer.addTo(map)
-                layerObj.layer.on("click", (evt) => {
-                    console.log(layerObj.layer)
+                //layerObj.layer.on("click", (evt) => {
+                    //console.log(layerObj.layer)
                     //sidebar.update(evt.layer.feature.properties, layerObj.eventType)
-                })
+                //)
             }
             })
   
