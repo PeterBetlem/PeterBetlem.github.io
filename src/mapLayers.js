@@ -1,7 +1,7 @@
 import { sidebar } from "./map"
 const OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
-    attribution: 'Map data &copy; OpenStreetMap contributors | Svalbox'
+    attribution: 'Map data &copy; OpenStreetMap contributors | Svalbox | BetlemTech'
 });
 
 const doms_request = "https://svalbox.unis.no/arcgis/rest/services/dom/DOM/FeatureServer/1/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
@@ -15,18 +15,6 @@ const doms_layer = L.geoJson(null, {
     id: "dom"
     }
 )
-$.getJSON(doms_request, function(data){
-// L.geoJson function is used to parse geojson file and load on to map
-doms_layer.addData(data)
-})
-/*    .success(function(){
-        console.log("Successfully retrieved GIS objects.")
-    })
-    */
-.fail(function(){
-    alert('Failed to access Svalbox GIS data')
-    console.log("Failed to retrieve Svalbox GIS objects.")
-})
 
 var img360_markers = L.markerClusterGroup({
     spiderfyOnMaxZoom: false,
@@ -50,20 +38,6 @@ const img360_layer = L.geoJson(null, {
     id: "img360"
     }
 )
-$.getJSON(img360_request, function(data){
-    // L.geoJson function is used to parse geojson file and load on to map
-    img360_layer.addData(data)
-    // img360_markers.addLayer(img360_layer)
-
-    })
-    /*    .success(function(){
-            console.log("Successfully retrieved GIS objects.")
-        })
-        */
-    .fail(function(){
-        alert('Failed to access Img360 GIS data')
-        console.log("Failed to retrieve Img360 GIS objects.")
-    })
 
 var geojsonMarkerOptions = {
     radius: 100,
@@ -97,16 +71,44 @@ const datalayer = L.geoJson(null, {
     });
 
 $.getJSON(areasRequest, function(data){
-// L.geoJson function is used to parse geojson file and load on to map
-datalayer.addData(data)
+    // L.geoJson function is used to parse geojson file and load on to map
+    datalayer.addData(data)
     })
-/*    .success(function(){
+    /*    .success(function(){
         console.log("Successfully retrieved GIS objects.")
     })
     */
     .fail(function(){
         alert('Failed to access project GIS data')
         console.log("Failed to retrieve project GIS objects.")
+    })
+
+$.getJSON(doms_request, function(data){
+    // L.geoJson function is used to parse geojson file and load on to map
+    doms_layer.addData(data)
+    })
+    /*    .success(function(){
+            console.log("Successfully retrieved GIS objects.")
+        })
+        */
+    .fail(function(){
+        alert('Failed to access Svalbox GIS data')
+        console.log("Failed to retrieve Svalbox GIS objects.")
+    })
+
+$.getJSON(img360_request, function(data){
+    // L.geoJson function is used to parse geojson file and load on to map
+    img360_layer.addData(data)
+    // img360_markers.addLayer(img360_layer)
+
+    })
+    /*    .success(function(){
+            console.log("Successfully retrieved GIS objects.")
+        })
+        */
+    .fail(function(){
+        alert('Failed to access Img360 GIS data')
+        console.log("Failed to retrieve Img360 GIS objects.")
     })
 
 export const mapLayers = [
