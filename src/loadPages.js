@@ -1,6 +1,3 @@
-
-import { generateBibliography } from "./bibiography"
-
 export function loadSidebarPages () {
         $( "#home" ).load( "./pages/home.html" );
         $( "#projects" ).load( "./pages/projects.html" );

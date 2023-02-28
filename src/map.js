@@ -6,6 +6,11 @@ import { mapLayers } from "./mapLayers"
 
 const L = window.L
 
+var container = L.DomUtil.get('map');
+      if(container != null){
+        container._leaflet_id = null;
+      }
+
 const map = L.map("map", {
     center: [67, 10],
     zoom: 4,
