@@ -6,19 +6,15 @@ import { mapLayers } from "./mapLayers"
 
 const L = window.L
 
-var container = L.DomUtil.get('map');
-      if(container != null){
-        container._leaflet_id = null;
-      }
-
-const map = L.map("map", {
+var map;
+if (map != undefined) map.remove();
+map = L.map("map", {
     center: [67, 10],
     zoom: 4,
-    minZoom: 4,
-    zoomControl: false, // add manually later to place below layer control
-  })
+    minZoom: 4 // add manually later to place below layer control
+    })
 
-// create the sidebar instance and add it to the map
+    // create the sidebar instance and add it to the map
 
 
 export var sidebar = L.control.sidebar({ container: 'sidebar' })
