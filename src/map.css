@@ -1,0 +1,38 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+html, body, #map {
+    height: 100%;
+    font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.lorem {
+    font-style: italic;
+    text-align: justify;
+    color: #AAA;
+}
+
+
+.csl-entry {
+    padding: 5px;
+    display: list-item; 
+}
+
+.ribbon {
+    font-size: 40px;
+    position: fixed;
+    inset: 0 auto auto 0;
+    background: hsl(66, 100%, 59%);
+    transform-origin: 100% 0;
+    transform: translate(-29.3%) rotate(-45deg);
+    box-shadow: 0 0 0 999px hsl(66, 100%, 59%);
+    clip-path: inset(0 -100%);
+    z-index: 1000
+  }
+  .ribbon-right {
+    inset: 0 0 auto auto; /* top and right equal to 0 */
+    transform-origin: 0 0; /* OR top left */
+    transform: translate(29.3%) rotate(45deg);
+  }
