@@ -1,43 +1,51 @@
-import { sidebar } from "./map"
+import { sidebar, map } from "./map"
 /*const OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18});
 */
+
+var md = window.markdownit();
 var OSM = new L.StamenTileLayer("watercolor");
+
+var domStyleOptions = {
+    fillColor: "red",
+    color: "red",
+    weight: 3,
+}
 
 const doms_request = "https://svalbox.unis.no/arcgis/rest/services/dom/DOM/FeatureServer/1/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
 const doms_layer = L.geoJson(null, {
-    style: {
-        fillColor: "red",
-        color: "red",
-        weight: 1,
-    },
+    style: domStyleOptions,
     onEachFeature: onEachFeatureClosure("dom"),
     id: "dom"
     }
 )
 
-var img360_markers = L.markerClusterGroup({
-    spiderfyOnMaxZoom: false,
-    showCoverageOnHover: false
+var img360_markers = new L.markerClusterGroup({
+	spiderfyOnMaxZoom: true,
+	showCoverageOnHover: false,
+    removeOutsideVisibleBounds: true,
+    clusterPane: "tilePane"
     }); 
 const img360_request = "https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
 const img360_layer = L.geoJson(null, {
     pointToLayer: function(feature, latlng) {
+        var marker = L.circleMarker(latlng, {
+            radius:3,
+            opacity: .5,
+            color: "orange",
+            //color:getColor(feature.properties.League),
+            //fillColor:  getColor(feature.properties.League),
+            fillOpacity: 0.8
 
-        return L.circleMarker(latlng, {
-        radius:3,
-        opacity: .5,
-        color: "yellow",
-        //color:getColor(feature.properties.League),
-        //fillColor:  getColor(feature.properties.League),
-        fillOpacity: 0.8
-
-        });  //.bindTooltip(feature.properties.Name);
+            });  //.bindTooltip(feature.properties.Name);
+        marker.addTo(img360_markers);
+        return marker
         },
     onEachFeature: onEachFeatureClosure("img360"),
     id: "img360"
     }
 )
+
 
 var geojsonMarkerOptions = {
     radius: 100,
@@ -73,9 +81,12 @@ const projects_layer = L.geoJson(null, {
 
 
 const personal_doms = L.geoJson(null, {
+    style: domStyleOptions,
     onEachFeature: onEachFeatureClosure("v3geo"),
     id: "doms"
     });
+
+export var searchGroup = L.featureGroup([projects_layer, personal_doms]);
 
 
 function getJSONForRequest(request, container) {
@@ -98,12 +109,21 @@ getJSONForRequest(projectsRequest, projects_layer)
 getJSONForRequest(doms_request, doms_layer)
 getJSONForRequest(img360_request, img360_layer)
 
+
+
+
 export const mapLayers = [
     {
         layer: OSM,
         defaultAdd: true,
         baseLayerControl: true,
         title: "OSM",
+    },
+    {
+        layer: img360_markers,
+        eventType: "img360",
+        overlayLayerControl: true,
+        title: "Photospheres",
     },
     {
         layer: doms_layer,
@@ -118,12 +138,6 @@ export const mapLayers = [
         title: "DOMs",
     },
     {
-        layer: img360_layer,
-        eventType: "img360",
-        overlayLayerControl: true,
-        title: "Photospheres",
-    },
-    {
         layer: projects_layer,
         eventType: "projects",
         overlayLayerControl: true,
@@ -131,12 +145,13 @@ export const mapLayers = [
     },
 ]
 
+
 function onEachFeatureClosure(data_type) {
     return function onEachFeature (feature, layer) {
         layer.on("click", function(e){
             switch (data_type) {
                 case "project":
-                    $( "#projects-content" ).html("<p>" + feature.properties.description + "</p>")
+                    $( "#projects-content" ).html(md.render("## " + feature.properties.name) + md.render(feature.properties.description))
                     sidebar.open("projects")
                     break
                 case "dom":
@@ -156,3 +171,6 @@ function onEachFeatureClosure(data_type) {
     })
     }
 }
+
+
+console.log(img360_markers)

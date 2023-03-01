@@ -1,100 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-        crossorigin=""/>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+            crossorigin=""/>
 
-    <link rel="stylesheet" href="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/css/leaflet-sidebar.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" crossorigin="">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
-
-  </head>
-  <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/citation-js/0.6.7/citation.min.js" integrity="sha512-N+LDFMa9owHXGS+CyMrBvuxq2QuGl3fiB/7cys3aUEL7K6P1soHGqsS0sjHXZpwNd9Kz0m3R4IPy1HYRi6ROEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-        crossorigin=""></script>
-    <script src="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/js/leaflet-sidebar.js"></script>
-    <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/citeproc-js-es5@1.0.4/dist/citeproc.min.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" crossorigin=""></script>
-    <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
-    <div id="sidebar" class="leaflet-sidebar collapsed">
-
-      <!-- nav tabs -->
-      <div class="leaflet-sidebar-tabs">
-          <!-- top aligned tabs -->
-          <ul role="tablist">
-              <li><a href="#home" role="tab"><i class="fa-solid fa-circle-info"></i></a></li>
-              <li><a href="#projects" role="tab"><i class="fa-solid fa-map-location-dot"></i></a></li>
-              <li><a href="#events" role="tab"><i class="fa-solid fa-street-view"></i></a></li>
-              <li><a href="#publications" role="tab"><i class="fa-solid fa-file-contract"></i></a></li>
-              <li><a href="#teaching" role="tab"><i class="fa-solid fa-person-chalkboard"></i></a></li>
-              <li><a href="#grants" role="tab"><i class="fa-solid fa-magnifying-glass-dollar"></i></a></li>
-              <li><a href="#contact" role="tab"><i class="fa fa-address-card"></i></a></li>
-          </ul>
-
-          <!-- bottom aligned tabs -->
-          <ul role="tablist">
-              <li><a href="https://github.com/PeterBetlem" target=”_blank”><i class="fa-brands fa-github"></i></a></li>
-              <li><a href="https://scholar.google.com/citations?user=vdV4YxIAAAAJ&hl=en&oi=ao" target=”_blank”><i class="fa-brands fa-google"></i></a></li>
-          </ul>
-      </div>
-
-      <!-- panel content -->
-      <div class="leaflet-sidebar-content">
-          <div class="leaflet-sidebar-pane" id="home">
-            
-          </div>
-          <div class="leaflet-sidebar-pane" id="teaching">
-          </div>
-
-          <div class="leaflet-sidebar-pane" id="projects">
-          </div>
-
-          <div class="leaflet-sidebar-pane" id="events">
-          </div>
-
-          <div class="leaflet-sidebar-pane" id="publications">
-                    <h1 class="leaflet-sidebar-header">
-            Scientific record
-            <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
-        </h1>
+        <link rel="stylesheet" href="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/css/leaflet-sidebar.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" crossorigin="">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/3.0.9/leaflet-search.min.css" integrity="sha512-1TnOnmQ91QV8X1/dj6UMPhRM35nAnBanyvXPFU7uqV3xg+++cGxIBR6Bh5D7F8wVrwNm8eAfBWNYX/4yce4CiQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/citation-js/0.6.7/citation.min.js" integrity="sha512-N+LDFMa9owHXGS+CyMrBvuxq2QuGl3fiB/7cys3aUEL7K6P1soHGqsS0sjHXZpwNd9Kz0m3R4IPy1HYRi6ROEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+            crossorigin=""></script>
+        <script src="https://www.unpkg.com/leaflet-sidebar-v2@3.2.3/js/leaflet-sidebar.js"></script>
+        <script src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/citeproc-js-es5@1.0.4/dist/citeproc.min.js"></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" crossorigin=""></script>
+        <script type="text/javascript" src="https://stamen-maps.a.ssl.fastly.net/js/tile.stamen.js?v1.3.0"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js" integrity="sha512-SYfDUYPg5xspsG6OOpXU366G8SZsdHOhqk/icdrYJ2E/WKZxPxze7d2HD3AyXpT7U22PZ5y74xRpqZ6A2bJ+kQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-search/3.0.9/leaflet-search.min.js" integrity="sha512-erNK0f3PSiL/SdS247MoOAK95iJCmfueXT4WG5eyRBR1eOgcE0bI5y2fSEVTQfAS53pTqL/VIQpJXnG99U1n+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         
-        <div id="publications-content">
-        
-            <h3>
-                Recent Journal Publications
-            </h3>
-        
-                <div id="publications-list">
-        
-                </div>
-        
-            <h3>
-                Recent Conference Proceedings
-            </h3>
-        
-                <div id="conferences-list">
-        
-                </div>
+        <div id="sidebar" class="leaflet-sidebar collapsed">
+
+        <!-- nav tabs -->
+        <div class="leaflet-sidebar-tabs">
+            <!-- top aligned tabs -->
+            <ul role="tablist">
+                <li><a href="#home" role="tab"><i class="fa-solid fa-circle-info"></i></a></li>
+                <li><a href="#projects" role="tab"><i class="fa-solid fa-map-location-dot"></i></a></li>
+                <li><a href="#events" role="tab"><i class="fa-solid fa-street-view"></i></a></li>
+                <li><a href="#publications" role="tab"><i class="fa-solid fa-file-contract"></i></a></li>
+                <li><a href="#teaching" role="tab"><i class="fa-solid fa-person-chalkboard"></i></a></li>
+                <li><a href="#grants" role="tab"><i class="fa-solid fa-magnifying-glass-dollar"></i></a></li>
+                <li><a href="#contact" role="tab"><i class="fa fa-address-card"></i></a></li>
+            </ul>
+
+            <!-- bottom aligned tabs -->
+            <ul role="tablist">
+                <li><a href="https://github.com/PeterBetlem" target=”_blank”><i class="fa-brands fa-github"></i></a></li>
+                <li><a href="https://scholar.google.com/citations?user=vdV4YxIAAAAJ&hl=en&oi=ao" target=”_blank”><i class="fa-brands fa-google"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- panel content -->
+        <div class="leaflet-sidebar-content">
+            <div class="leaflet-sidebar-pane" id="home">
                 
-            <p>A more extensive list can be found at <a href="https://scholar.google.com/citations?user=vdV4YxIAAAAJ&hl=en&oi=ao">Google Scholar</a>.</p>
-        
-        </div>
-          </div>
+            </div>
+            <div class="leaflet-sidebar-pane" id="teaching">
+            </div>
 
-          <div class="leaflet-sidebar-pane" id="grants">
-          </div>
-          
-          <div class="leaflet-sidebar-pane" id="contact">
-          </div>
-        </div>
-    </div>
+            <div class="leaflet-sidebar-pane" id="projects">
+            </div>
 
-    <div id="map"></div>
-    <script src="./bundle.js"></script>
-    <div class="ribbon ribbon-right">Currently under construction</div>
-</body>
+            <div class="leaflet-sidebar-pane" id="events">
+            </div>
+
+            <div class="leaflet-sidebar-pane" id="publications">
+                        <h1 class="leaflet-sidebar-header">
+                Scientific record
+                <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
+            </h1>
+            
+            <div id="publications-content">
+            
+                <h3>
+                    Recent Journal Publications
+                </h3>
+            
+                    <div id="publications-list">
+            
+                    </div>
+            
+                <h3>
+                    Recent Conference Proceedings
+                </h3>
+            
+                    <div id="conferences-list">
+            
+                    </div>
+                    
+                <p>A more extensive list can be found at <a href="https://scholar.google.com/citations?user=vdV4YxIAAAAJ&hl=en&oi=ao">Google Scholar</a>.</p>
+            
+            </div>
+            </div>
+
+            <div class="leaflet-sidebar-pane" id="grants">
+            </div>
+            
+            <div class="leaflet-sidebar-pane" id="contact">
+            </div>
+            </div>
+        </div>
+
+        <div id="map"></div>
+        <script src="./bundle.js"></script>
+        <div class="ribbon ribbon-right">Currently under construction</div>
+    </body>
   
 </html>

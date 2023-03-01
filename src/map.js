@@ -2,11 +2,11 @@ import "./map.css";
 
 import { generateBibliography } from "./bibiography"
 import { loadSidebarPages } from "./loadPages"
-import { mapLayers } from "./mapLayers"
+import { mapLayers, searchGroup, img360_markers } from "./mapLayers"
 
 const L = window.L
 
-var map;
+export var map;
 if (map != undefined) map.remove();
 map = L.map("map", {
     center: [57, 10],
@@ -83,3 +83,23 @@ mapLayers.forEach((layerObj) => {
         //)
     }
     })
+    
+var searchControl = new L.Control.Search({
+    layer: searchGroup, 
+    propertyName: "name",
+    autoCollapse: true,
+    initial: false,
+    position: "topright",
+    collapsed: false,
+    hideMarkerOnCollapse: true,
+    zoom: 5
+})
+    .on('search:locationfound', function(e){
+        console.log(e)
+        e.layer.fire("click")
+
+    })
+map.addControl(
+    searchControl
+    )
+
