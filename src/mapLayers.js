@@ -1,8 +1,8 @@
 import { sidebar } from "./map"
-const OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; OpenStreetMap contributors | Svalbox | BetlemTech'
-});
+/*const OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18});
+*/
+var OSM = new L.StamenTileLayer("watercolor");
 
 const doms_request = "https://svalbox.unis.no/arcgis/rest/services/dom/DOM/FeatureServer/1/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
 const doms_layer = L.geoJson(null, {
@@ -11,7 +11,7 @@ const doms_layer = L.geoJson(null, {
         color: "red",
         weight: 1,
     },
-    onEachFeature: onEachFeature,
+    onEachFeature: onEachFeatureClosure("dom"),
     id: "dom"
     }
 )
@@ -34,7 +34,7 @@ const img360_layer = L.geoJson(null, {
 
         });  //.bindTooltip(feature.properties.Name);
         },
-    onEachFeature: onEachFeature,
+    onEachFeature: onEachFeatureClosure("img360"),
     id: "img360"
     }
 )
@@ -51,6 +51,7 @@ var geojsonMarkerOptions = {
 var myRequest = "https://wms.qgiscloud.com/peterbetlem/rnd?service=WFS&request=GetFeature";
 var outputFormat = "outputformat=geojson";
 var areasRequest = myRequest + "&typename=areas&" + outputFormat; 
+var domsRequest = myRequest + "&typename=doms&" + outputFormat; 
 
 const datalayer = L.geoJson(null, {
 
@@ -66,9 +67,29 @@ const datalayer = L.geoJson(null, {
 
         });  //.bindTooltip(feature.properties.Name);
     },
-    onEachFeature: onEachFeature,
+    onEachFeature: onEachFeatureClosure("project"),
     id: "projects"
     });
+
+
+const personal_doms = L.geoJson(null, {
+    onEachFeature: onEachFeatureClosure("v3geo"),
+    id: "doms"
+    });
+
+
+$.getJSON(domsRequest, function(data){
+    // L.geoJson function is used to parse geojson file and load on to map
+    personal_doms.addData(data)
+    })
+    /*    .success(function(){
+        console.log("Successfully retrieved GIS objects.")
+    })
+    */
+    .fail(function(){
+        alert('Failed to access project GIS data')
+        console.log("Failed to retrieve project GIS objects.")
+    })
 
 $.getJSON(areasRequest, function(data){
     // L.geoJson function is used to parse geojson file and load on to map
@@ -125,6 +146,12 @@ export const mapLayers = [
         title: "DOMs",
     },
     {
+        layer: personal_doms,
+        eventType: "DOMs",
+        overlayLayerControl: true,
+        title: "DOMs",
+    },
+    {
         layer: img360_layer,
         eventType: "img360",
         overlayLayerControl: true,
@@ -138,22 +165,28 @@ export const mapLayers = [
     },
 ]
 
-function onEachFeature (feature, layer) {
-    layer.on("click", function(e){
-        switch (Object.keys(layer._eventParents)[0].toString()) {
-            case datalayer._leaflet_id.toString():
-                $( "#projects-content" ).html("<p>" + feature.properties.description + "</p>")
-                sidebar.open("projects")
-                break
-            case doms_layer._leaflet_id.toString():
-                $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/' + feature.properties.publ_sketchfab_id + '/embed"></iframe></div>')
-                sidebar.open("events")
-                break
-            case img360_layer._leaflet_id.toString():
-                $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
-                     ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+feature.properties.api_link+'&autoLoad=false"></iframe></div>')
-                sidebar.open("events")
-                break
-            }
-})
+function onEachFeatureClosure(data_type) {
+    return function onEachFeature (feature, layer) {
+        layer.on("click", function(e){
+            switch (data_type) {
+                case "project":
+                    $( "#projects-content" ).html("<p>" + feature.properties.description + "</p>")
+                    sidebar.open("projects")
+                    break
+                case "dom":
+                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/' + feature.properties.publ_sketchfab_id + '/embed"></iframe></div>')
+                    sidebar.open("events")
+                    break
+                case "v3geo":
+                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" title="Piz Laviner - Err detachment system | V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://v3geo.com/viewer/index.html#/' + feature.properties.v3geo_id + '"></iframe></div>')
+                    sidebar.open("events")
+                    break
+                case "img360":
+                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
+                        ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+feature.properties.api_link+'&autoLoad=false"></iframe></div>')
+                    sidebar.open("events")
+                    break
+                }
+    })
+    }
 }

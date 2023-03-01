@@ -9,11 +9,12 @@ const L = window.L
 var map;
 if (map != undefined) map.remove();
 map = L.map("map", {
-    center: [67, 10],
-    zoom: 4,
-    minZoom: 4 // add manually later to place below layer control
+    center: [57, 10],
+    zoom: 3,
+    minZoom: 2 // add manually later to place below layer control
     })
 
+map.attributionControl.setPrefix('BetlemTech | Leaflet')
     // create the sidebar instance and add it to the map
 
 
