@@ -50,10 +50,10 @@ var geojsonMarkerOptions = {
 
 var myRequest = "https://wms.qgiscloud.com/peterbetlem/rnd?service=WFS&request=GetFeature";
 var outputFormat = "outputformat=geojson";
-var areasRequest = myRequest + "&typename=areas&" + outputFormat; 
+var projectsRequest = myRequest + "&typename=projects&" + outputFormat; 
 var domsRequest = myRequest + "&typename=doms&" + outputFormat; 
 
-const datalayer = L.geoJson(null, {
+const projects_layer = L.geoJson(null, {
 
     pointToLayer: function(feature, latlng) {
 
@@ -78,59 +78,25 @@ const personal_doms = L.geoJson(null, {
     });
 
 
-$.getJSON(domsRequest, function(data){
-    // L.geoJson function is used to parse geojson file and load on to map
-    personal_doms.addData(data)
-    })
-    /*    .success(function(){
-        console.log("Successfully retrieved GIS objects.")
-    })
-    */
-    .fail(function(){
-        alert('Failed to access project GIS data')
-        console.log("Failed to retrieve project GIS objects.")
-    })
-
-$.getJSON(areasRequest, function(data){
-    // L.geoJson function is used to parse geojson file and load on to map
-    datalayer.addData(data)
-    })
-    /*    .success(function(){
-        console.log("Successfully retrieved GIS objects.")
-    })
-    */
-    .fail(function(){
-        alert('Failed to access project GIS data')
-        console.log("Failed to retrieve project GIS objects.")
-    })
-
-$.getJSON(doms_request, function(data){
-    // L.geoJson function is used to parse geojson file and load on to map
-    doms_layer.addData(data)
-    })
-    /*    .success(function(){
+function getJSONForRequest(request, container) {
+    $.getJSON(request, function(data){
+        // L.geoJson function is used to parse geojson file and load on to map
+        container.addData(data)
+        })
+        /*    .success(function(){
             console.log("Successfully retrieved GIS objects.")
         })
         */
-    .fail(function(){
-        alert('Failed to access Svalbox GIS data')
-        console.log("Failed to retrieve Svalbox GIS objects.")
-    })
-
-$.getJSON(img360_request, function(data){
-    // L.geoJson function is used to parse geojson file and load on to map
-    img360_layer.addData(data)
-    // img360_markers.addLayer(img360_layer)
-
-    })
-    /*    .success(function(){
-            console.log("Successfully retrieved GIS objects.")
+        .fail(function(){
+            alert('Failed to access project GIS data')
+            console.log("Failed to retrieve project GIS objects.")
         })
-        */
-    .fail(function(){
-        alert('Failed to access Img360 GIS data')
-        console.log("Failed to retrieve Img360 GIS objects.")
-    })
+}
+
+getJSONForRequest(domsRequest, personal_doms)
+getJSONForRequest(projectsRequest, projects_layer)
+getJSONForRequest(doms_request, doms_layer)
+getJSONForRequest(img360_request, img360_layer)
 
 export const mapLayers = [
     {
@@ -158,7 +124,7 @@ export const mapLayers = [
         title: "Photospheres",
     },
     {
-        layer: datalayer,
+        layer: projects_layer,
         eventType: "projects",
         overlayLayerControl: true,
         title: "Projects",
