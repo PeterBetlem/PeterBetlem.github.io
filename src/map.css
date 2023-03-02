@@ -21,18 +21,65 @@ html, body, #map {
 }
 
 .ribbon {
-    font-size: 40px;
+    font-size: 30px;
     position: fixed;
     inset: 0 auto auto 0;
-    background: hsl(66, 100%, 59%);
+    background: #0074d9;
     transform-origin: 100% 0;
     transform: translate(-29.3%) rotate(-45deg);
-    box-shadow: 0 0 0 999px hsl(66, 100%, 59%);
+    box-shadow: 0 0 0 999px #0074d9;
     clip-path: inset(0 -100%);
-    z-index: 1000
+    z-index: 500
   }
   .ribbon-right {
     inset: 0 0 auto auto; /* top and right equal to 0 */
     transform-origin: 0 0; /* OR top left */
     transform: translate(29.3%) rotate(45deg);
+  }
+
+img.rounded {
+object-fit: cover;
+border-radius: 50%;
+float: right;
+margin: 10px;
+}
+  
+  table {
+    border: 2px solid #FFFFFF;
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+  }
+  table td, table th {
+    border: 1px solid #FFFFFF;
+    padding: 3px 4px;
+  }
+  table tbody td {
+    font-size: 13px;
+  }
+  table td:nth-child(even) {
+    background: #0074d925;
+  }
+  table thead {
+    background: #FFFFFF;
+    border-bottom: 4px solid #333333;
+  }
+  table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333333;
+    text-align: center;
+  }
+  table thead th:first-child {
+    border-left: none;
+  }
+  
+  table tfoot {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333333;
+    border-top: 4px solid #333333;
+  }
+  table tfoot td {
+    font-size: 14px;
   }

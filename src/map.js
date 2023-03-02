@@ -2,9 +2,16 @@ import "./map.css";
 
 import { generateBibliography } from "./bibiography"
 import { loadSidebarPages } from "./loadPages"
-import { mapLayers, searchGroup, img360_markers } from "./mapLayers"
+import { mapLayers, searchGroup } from "./mapLayers"
 
 const L = window.L
+
+export var md = require('markdown-it')({
+    html: true,
+    linkify: true,
+    typographer: true
+  });
+  
 
 export var map;
 if (map != undefined) map.remove();
@@ -18,7 +25,12 @@ map.attributionControl.setPrefix('BetlemTech | Leaflet')
     // create the sidebar instance and add it to the map
 
 
-export var sidebar = L.control.sidebar({ container: 'sidebar' })
+export var sidebar = L.control.sidebar({
+     container: 'sidebar',
+     closeButton: true,
+     autopan: true
+    
+    })
 /*sidebar.update = function (props, type) {
     switch (type) {
     case "projects":
@@ -75,8 +87,8 @@ mapLayers.forEach((layerObj) => {
     }
 
     if (layerObj.eventType !== "undefined") {
-        //console.log(layerObj)
         layerObj.layer.addTo(map)
+        
         //layerObj.layer.on("click", (evt) => {
             //console.log(layerObj.layer)
             //sidebar.update(evt.layer.feature.properties, layerObj.eventType)
@@ -95,11 +107,14 @@ var searchControl = new L.Control.Search({
     zoom: 5
 })
     .on('search:locationfound', function(e){
-        console.log(e)
         e.layer.fire("click")
 
     })
+
+
 map.addControl(
     searchControl
     )
 
+
+    

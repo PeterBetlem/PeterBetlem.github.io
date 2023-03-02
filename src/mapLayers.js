@@ -1,9 +1,9 @@
-import { sidebar, map } from "./map"
+import { md, sidebar, map } from "./map"
 /*const OSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18});
 */
 
-var md = window.markdownit();
+ 
 var OSM = new L.StamenTileLayer("watercolor");
 
 var domStyleOptions = {
@@ -38,7 +38,7 @@ const img360_layer = L.geoJson(null, {
             fillOpacity: 0.8
 
             });  //.bindTooltip(feature.properties.Name);
-        marker.addTo(img360_markers);
+        //marker.addTo(img360_markers);
         return marker
         },
     onEachFeature: onEachFeatureClosure("img360"),
@@ -75,7 +75,7 @@ const projects_layer = L.geoJson(null, {
 
         });  //.bindTooltip(feature.properties.Name);
     },
-    onEachFeature: onEachFeatureClosure("project"),
+    onEachFeature: onEachFeatureClosure("projects"),
     id: "projects"
     });
 
@@ -109,9 +109,6 @@ getJSONForRequest(projectsRequest, projects_layer)
 getJSONForRequest(doms_request, doms_layer)
 getJSONForRequest(img360_request, img360_layer)
 
-
-
-
 export const mapLayers = [
     {
         layer: OSM,
@@ -119,13 +116,13 @@ export const mapLayers = [
         baseLayerControl: true,
         title: "OSM",
     },
-    {
-        layer: img360_markers,
+/*    {
+        layer: img360_layer,
         eventType: "img360",
         overlayLayerControl: true,
         title: "Photospheres",
     },
-    {
+*/    {
         layer: doms_layer,
         eventType: "DOMs",
         overlayLayerControl: true,
@@ -145,32 +142,81 @@ export const mapLayers = [
     },
 ]
 
-
 function onEachFeatureClosure(data_type) {
     return function onEachFeature (feature, layer) {
         layer.on("click", function(e){
             switch (data_type) {
-                case "project":
-                    $( "#projects-content" ).html(md.render("## " + feature.properties.name) + md.render(feature.properties.description))
+                case "projects":
+                    updateProjectDivTag("#projects", feature.properties)
+                    window.location.hash = '#projects='+feature.properties.name.replace(/\s+/g, '-').toLowerCase()
                     sidebar.open("projects")
                     break
                 case "dom":
-                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/' + feature.properties.publ_sketchfab_id + '/embed"></iframe></div>')
+                    updateSketchfabDivTag("#events", feature.properties)
+                    $( "#events-content" ).html()
                     sidebar.open("events")
                     break
                 case "v3geo":
-                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" title="Piz Laviner - Err detachment system | V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://v3geo.com/viewer/index.html#/' + feature.properties.v3geo_id + '"></iframe></div>')
+                    updateV3geoDivTag("#events", feature.properties)
                     sidebar.open("events")
                     break
                 case "img360":
-                    $( "#events-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
-                        ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+feature.properties.api_link+'&autoLoad=false"></iframe></div>')
+                    updateImg360DivTag("#events", feature.properties)
                     sidebar.open("events")
                     break
                 }
     })
+
+    window.addEventListener('hashchange', function () {
+        zoomToURL("projects", data_type, feature)
+    });
+    zoomToURL("projects", data_type, feature)
+    
+    
+        
     }
 }
 
+function updateProjectDivTag( divTag, properties) {
+    $( divTag + "-content-header").html( md.render("## " + properties.name) )
+    $( divTag + "-content" ).html( md.render(properties.description) )
+}
 
-console.log(img360_markers)
+function updateV3geoDivTag( divTag, properties) {
+    $( divTag + "-content" ).html(
+        '<br><div> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;'+
+        '" title="Piz Laviner - Err detachment system | V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
+        'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
+        'execution-while-not-rendered web-share src="https://v3geo.com/viewer/index.html#/' + properties.v3geo_id + '"></iframe></div>')
+}
+
+function updateSketchfabDivTag( divTag, properties) {
+    $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> '+
+    '<iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
+    'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
+    'execution-while-not-rendered web-share src="https://sketchfab.com/models/' + properties.publ_sketchfab_id + '/embed"></iframe></div>')
+}
+
+function updateImg360DivTag( divTag, properties) {
+    $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
+    ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+properties.api_link+'&autoLoad=false"></iframe></div>')
+}
+
+
+function zoomToURL(target_data_type, data_type, feature){
+    const location = window.location.href
+    if (location.includes("#"+target_data_type+"=")) {
+        const project = location.split('projects=')[1]
+    
+        if (data_type == target_data_type && feature.properties.name) {
+            if (feature.properties.name.replace(/\s+/g, '-').toLowerCase() == project.replace(/\s+/g, '-').toLowerCase()) {
+                updateProjectDivTag("#projects", feature.properties)
+                sidebar.open("projects")
+                map.flyTo([feature.geometry.coordinates[0][1], feature.geometry.coordinates[0][0]], 5);
+            }
+    
+        }
+    
+    }
+
+    }
