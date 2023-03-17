@@ -1,2 +1,4 @@
 dist/
 node_modules/
+src/biblio.bib
+src/biblio.json

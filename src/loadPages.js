@@ -7,7 +7,7 @@ export function loadSidebarPages () {
         $( "#teaching" ).load( "./pages/teaching.html" );
         $( "#events" ).load( "./pages/events.html" );
         $( "#grants" ).load( "./pages/grants.html" )
-        generateFundingPage()
+        generateFundingPage2()
         
 //       $( "#publications" ).load( "./pages/publications.html" ); // automatically refreshed.
 }
@@ -38,5 +38,55 @@ function generateFundingPage () {
         $( "#grants-content" ).html( md.render(header) )
         })
 }
+
+
+function generateFundingPage2 () {
+        var myRequest = "https://wms.qgiscloud.com/peterbetlem/rnd?service=WFS&request=GetFeature";
+        var outputFormat = "outputformat=geojson";
+        var grantsRequest = myRequest + "&typename=grants&" + outputFormat; 
+        var data = [];
+
+        $.getJSON( grantsRequest, function(json) {
+                $.each(json.features, function(feature) {
+                        data.push(json.features[feature].properties)
+                }
+                )
+
+                data = data.sort((a, b) => parseFloat(b.year) - parseFloat(a.year))
+                for (let i in data) {
+                        console.log(data[i])
+                        if (data[i]["subfunding"]) {
+                                data[i]["funding"] = "<b>" + data[i]["funding"] + "</b><br>" + data[i]["subfunding"] + ""
+                        }
+                }
+
+                console.log(data[0]["funding"])
+                $('#grants-table').bootstrapTable({
+                        classes: "table",
+                        data: data,
+                        pagination: false,
+                        search: false,
+                        columns: [{
+                                field: 'year',
+                                title: 'Year'
+                        }, {
+                                field: 'funding',
+                                title: 'Funding'
+                        }, {
+                                field: 'number',
+                                title: '#'
+                        }, {
+                                field: 'amount',
+                                title: 'Amount'
+                        }]
+                        })
+
+              })
+
+              
+
+
+}
+
 
     

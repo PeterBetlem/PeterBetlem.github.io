@@ -18,7 +18,8 @@ if (map != undefined) map.remove();
 map = L.map("map", {
     center: [57, 10],
     zoom: 3,
-    minZoom: 2 // add manually later to place below layer control
+    minZoom: 2, // add manually later to place below layer control
+    maxZoom: 13,
     })
 
 map.attributionControl.setPrefix('BetlemTech | Leaflet')
@@ -39,10 +40,12 @@ export var sidebar = L.control.sidebar({
     }
 }*/
 
-
 sidebar
     .addTo(map)
     .open('home')
+
+sidebar.disablePanel('projects')
+sidebar.disablePanel('events')
 
     
 // add panels dynamically to the sidebar
@@ -115,6 +118,8 @@ var searchControl = new L.Control.Search({
 map.addControl(
     searchControl
     )
+
+
 
 
     

@@ -11,14 +11,13 @@ var domStyleOptions = {
     color: "red",
     weight: 3,
 }
-
-const doms_request = "https://svalbox.unis.no/arcgis/rest/services/dom/DOM/FeatureServer/1/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
-const doms_layer = L.geoJson(null, {
-    style: domStyleOptions,
-    onEachFeature: onEachFeatureClosure("dom"),
-    id: "dom"
-    }
-)
+var img360StyleOptions = {
+    fillColor: "orange",
+    color: "orange",
+    radius: 3,
+    opacity: 0.5,
+    fillOpacity: 0.8
+}
 
 var img360_markers = new L.markerClusterGroup({
 	spiderfyOnMaxZoom: true,
@@ -26,8 +25,16 @@ var img360_markers = new L.markerClusterGroup({
     removeOutsideVisibleBounds: true,
     clusterPane: "tilePane"
     }); 
-const img360_request = "https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Foot&relationParam=&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&gdbVersion=&returnDistinctValues=false&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&multipatchOption=&resultOffset=&resultRecordCount=&f=geojson"
-const img360_layer = L.geoJson(null, {
+
+var doms_layer = L.esri.featureLayer({
+    url: 'https://svalbox.unis.no/arcgis/rest/services/dom/DOM/MapServer/1',
+    style: domStyleOptions,
+    onEachFeature: onEachFeatureClosure("dom"),
+});
+
+var img360_layer = L.esri.featureLayer({
+    url: 'https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0',
+    onEachFeature: onEachFeatureClosure("img360"),
     pointToLayer: function(feature, latlng) {
         var marker = L.circleMarker(latlng, {
             radius:3,
@@ -41,11 +48,7 @@ const img360_layer = L.geoJson(null, {
         //marker.addTo(img360_markers);
         return marker
         },
-    onEachFeature: onEachFeatureClosure("img360"),
-    id: "img360"
-    }
-)
-
+});
 
 var geojsonMarkerOptions = {
     radius: 100,
@@ -86,7 +89,7 @@ const personal_doms = L.geoJson(null, {
     id: "doms"
     });
 
-export var searchGroup = L.featureGroup([projects_layer, personal_doms]);
+export var searchGroup = L.featureGroup([projects_layer, personal_doms, doms_layer]);
 
 
 function getJSONForRequest(request, container) {
@@ -106,8 +109,6 @@ function getJSONForRequest(request, container) {
 
 getJSONForRequest(domsRequest, personal_doms)
 getJSONForRequest(projectsRequest, projects_layer)
-getJSONForRequest(doms_request, doms_layer)
-getJSONForRequest(img360_request, img360_layer)
 
 export const mapLayers = [
     {
@@ -121,8 +122,8 @@ export const mapLayers = [
         eventType: "img360",
         overlayLayerControl: true,
         title: "Photospheres",
-    },
-*/    {
+    },*/
+    {
         layer: doms_layer,
         eventType: "DOMs",
         overlayLayerControl: true,
@@ -149,19 +150,24 @@ function onEachFeatureClosure(data_type) {
                 case "projects":
                     updateProjectDivTag("#projects", feature.properties)
                     window.location.hash = '#projects='+feature.properties.name.replace(/\s+/g, '-').toLowerCase()
+                    sidebar.enablePanel('projects');
                     sidebar.open("projects")
                     break
                 case "dom":
                     updateSketchfabDivTag("#events", feature.properties)
                     $( "#events-content" ).html()
+                    
+                    sidebar.enablePanel('events');
                     sidebar.open("events")
                     break
                 case "v3geo":
                     updateV3geoDivTag("#events", feature.properties)
+                    sidebar.enablePanel('events');
                     sidebar.open("events")
                     break
                 case "img360":
                     updateImg360DivTag("#events", feature.properties)
+                    sidebar.enablePanel('events');
                     sidebar.open("events")
                     break
                 }
@@ -178,11 +184,12 @@ function onEachFeatureClosure(data_type) {
 }
 
 function updateProjectDivTag( divTag, properties) {
-    $( divTag + "-content-header").html( md.render("## " + properties.name) )
+    $( divTag + "-title").html( properties.name )
     $( divTag + "-content" ).html( md.render(properties.description) )
 }
 
 function updateV3geoDivTag( divTag, properties) {
+    $( divTag + "-title").html( "Digital outcrop model" )
     $( divTag + "-content" ).html(
         '<br><div> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;'+
         '" title="Piz Laviner - Err detachment system | V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
@@ -191,6 +198,7 @@ function updateV3geoDivTag( divTag, properties) {
 }
 
 function updateSketchfabDivTag( divTag, properties) {
+    $( divTag + "-title").html( "Digital outcrop model" )
     $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> '+
     '<iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
     'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
@@ -198,6 +206,7 @@ function updateSketchfabDivTag( divTag, properties) {
 }
 
 function updateImg360DivTag( divTag, properties) {
+    $( divTag + "-title").html( "Photosphere" )
     $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
     ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+properties.api_link+'&autoLoad=false"></iframe></div>')
 }
@@ -211,8 +220,9 @@ function zoomToURL(target_data_type, data_type, feature){
         if (data_type == target_data_type && feature.properties.name) {
             if (feature.properties.name.replace(/\s+/g, '-').toLowerCase() == project.replace(/\s+/g, '-').toLowerCase()) {
                 updateProjectDivTag("#projects", feature.properties)
+                sidebar.enablePanel('projects');
                 sidebar.open("projects")
-                map.flyTo([feature.geometry.coordinates[0][1], feature.geometry.coordinates[0][0]], 5);
+                map.flyTo([feature.geometry.coordinates[0][1], feature.geometry.coordinates[0][0]], 6);
             }
     
         }
