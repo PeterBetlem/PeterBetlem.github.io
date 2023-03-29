@@ -3,6 +3,15 @@ import { md, sidebar, map } from "./map"
     maxZoom: 18});
 */
 
+function get_random_color() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.round(Math.random() * 15)];
+    } 
+    return color;
+}
+
  
 var OSM = new L.StamenTileLayer("watercolor");
 
@@ -63,6 +72,7 @@ var myRequest = "https://wms.qgiscloud.com/peterbetlem/rnd?service=WFS&request=G
 var outputFormat = "outputformat=geojson";
 var projectsRequest = myRequest + "&typename=projects&" + outputFormat; 
 var domsRequest = myRequest + "&typename=doms&" + outputFormat; 
+var tracksRequest = myRequest + "&typename=tracks&" + outputFormat; 
 
 const projects_layer = L.geoJson(null, {
 
@@ -89,6 +99,12 @@ const personal_doms = L.geoJson(null, {
     id: "doms"
     });
 
+const project_tracks = L.geoJson(null, {
+    style: {color: get_random_color()},
+    onEachFeature: onEachFeatureClosure("tracks"),
+    id: "tracks"
+    });
+
 export var searchGroup = L.featureGroup([projects_layer, personal_doms, doms_layer]);
 
 
@@ -109,6 +125,7 @@ function getJSONForRequest(request, container) {
 
 getJSONForRequest(domsRequest, personal_doms)
 getJSONForRequest(projectsRequest, projects_layer)
+getJSONForRequest(tracksRequest, project_tracks)
 
 export const mapLayers = [
     {
@@ -141,6 +158,12 @@ export const mapLayers = [
         overlayLayerControl: true,
         title: "Projects",
     },
+    {
+        layer: project_tracks,
+        eventType: "tracks",
+        overlayLayerControl: true,
+        title: "Projects",
+    },
 ]
 
 function onEachFeatureClosure(data_type) {
@@ -167,6 +190,11 @@ function onEachFeatureClosure(data_type) {
                     break
                 case "img360":
                     updateImg360DivTag("#events", feature.properties)
+                    sidebar.enablePanel('events');
+                    sidebar.open("events")
+                    break
+                case "tracks":
+                    updateTracksDivTag("#events", feature.properties)
                     sidebar.enablePanel('events');
                     sidebar.open("events")
                     break
@@ -209,6 +237,17 @@ function updateImg360DivTag( divTag, properties) {
     $( divTag + "-title").html( "Photosphere" )
     $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
     ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+properties.api_link+'&autoLoad=false"></iframe></div>')
+}
+
+function updateTracksDivTag( divTag, properties) {
+    $( divTag + "-title").html( properties.name )
+    var youtube = '';
+    if (properties.uid_youtube) {
+        youtube = '<br><iframe width="100%" height="315" src="https://www.youtube.com/embed/' + properties.uid_youtube +'" title="YouTube video player"' + 
+        ' frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' + '<br>'
+    }
+    console.log(youtube)
+    $( divTag + "-content" ).html( youtube + md.render(properties.description) )
 }
 
 

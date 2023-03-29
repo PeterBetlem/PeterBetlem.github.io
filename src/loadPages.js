@@ -54,13 +54,11 @@ function generateFundingPage2 () {
 
                 data = data.sort((a, b) => parseFloat(b.year) - parseFloat(a.year))
                 for (let i in data) {
-                        console.log(data[i])
                         if (data[i]["subfunding"]) {
                                 data[i]["funding"] = "<b>" + data[i]["funding"] + "</b><br>" + data[i]["subfunding"] + ""
                         }
                 }
 
-                console.log(data[0]["funding"])
                 $('#grants-table').bootstrapTable({
                         classes: "table",
                         data: data,
