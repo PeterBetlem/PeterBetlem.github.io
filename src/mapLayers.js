@@ -3,11 +3,11 @@ import { md, sidebar, map } from "./map"
     maxZoom: 18});
 */
 
-function get_random_color() {
+function get_random_color(id) {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
     for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.round(Math.random() * 15)];
+        color += letters[Math.round(Math.random() * (5+5*id))];
     } 
     return color;
 }
@@ -100,7 +100,9 @@ const personal_doms = L.geoJson(null, {
     });
 
 const project_tracks = L.geoJson(null, {
-    style: {color: get_random_color()},
+    style: function(feature) {
+        return {color: get_random_color(feature.properties.qc_id)}
+    },
     onEachFeature: onEachFeatureClosure("tracks"),
     id: "tracks"
     });
