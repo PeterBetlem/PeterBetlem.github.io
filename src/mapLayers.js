@@ -35,30 +35,6 @@ var img360_markers = new L.markerClusterGroup({
     clusterPane: "tilePane"
     }); 
 
-var doms_layer = L.esri.featureLayer({
-    url: 'https://svalbox.unis.no/arcgis/rest/services/dom/DOM/MapServer/1',
-    style: domStyleOptions,
-    onEachFeature: onEachFeatureClosure("dom"),
-});
-
-var img360_layer = L.esri.featureLayer({
-    url: 'https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0',
-    onEachFeature: onEachFeatureClosure("img360"),
-    pointToLayer: function(feature, latlng) {
-        var marker = L.circleMarker(latlng, {
-            radius:3,
-            opacity: .5,
-            color: "orange",
-            //color:getColor(feature.properties.League),
-            //fillColor:  getColor(feature.properties.League),
-            fillOpacity: 0.8
-
-            });  //.bindTooltip(feature.properties.Name);
-        //marker.addTo(img360_markers);
-        return marker
-        },
-});
-
 var geojsonMarkerOptions = {
     radius: 100,
     fillColor: "#ff7800",
@@ -73,6 +49,17 @@ var outputFormat = "outputformat=geojson";
 var projectsRequest = myRequest + "&typename=projects&" + outputFormat; 
 var domsRequest = myRequest + "&typename=doms&" + outputFormat; 
 var tracksRequest = myRequest + "&typename=tracks&" + outputFormat; 
+var photosphereRequest = myRequest + "&typename=photo_sphere&" + outputFormat; 
+
+const project_tracks = L.geoJson(null, {
+    style: {color: "black",
+            dashArray: '5, 5', dashOffset: '5'},
+    //function(feature) {
+     //   return {color: get_random_color(feature.properties.qc_id)}
+    //},
+    onEachFeature: onEachFeatureClosure("tracks"),
+    id: "tracks"
+    });
 
 const projects_layer = L.geoJson(null, {
 
@@ -99,16 +86,22 @@ const personal_doms = L.geoJson(null, {
     id: "doms"
     });
 
-const project_tracks = L.geoJson(null, {
-    style: function(feature) {
-        return {color: get_random_color(feature.properties.qc_id)}
+const photo_spheres = L.geoJson(null, {
+    pointToLayer: function(feature, latlng) {
+
+        return L.circleMarker(latlng, {
+        radius:4,
+        opacity: .5,
+        color: "orange",
+        //color:getColor(feature.properties.League),
+        //fillColor:  getColor(feature.properties.League),
+        fillOpacity: 0.8
+
+        });  //.bindTooltip(feature.properties.Name);
     },
-    onEachFeature: onEachFeatureClosure("tracks"),
-    id: "tracks"
+    onEachFeature: onEachFeatureClosure("img360"),
+    id: "img360"
     });
-
-export var searchGroup = L.featureGroup([projects_layer, personal_doms, doms_layer]);
-
 
 function getJSONForRequest(request, container) {
     $.getJSON(request, function(data){
@@ -128,6 +121,33 @@ function getJSONForRequest(request, container) {
 getJSONForRequest(domsRequest, personal_doms)
 getJSONForRequest(projectsRequest, projects_layer)
 getJSONForRequest(tracksRequest, project_tracks)
+getJSONForRequest(photosphereRequest, photo_spheres)
+
+var doms_layer = L.esri.featureLayer({
+    url: 'https://svalbox.unis.no/arcgis/rest/services/dom/DOM/MapServer/1',
+    style: domStyleOptions,
+    onEachFeature: onEachFeatureClosure("dom"),
+});
+
+var img360_layer = L.esri.featureLayer({
+    url: 'https://svalbox.unis.no/arcgis/rest/services/Images/images360/MapServer/0',
+    onEachFeature: onEachFeatureClosure("img360"),
+    pointToLayer: function(feature, latlng) {
+        var marker = L.circleMarker(latlng, {
+            radius:3,
+            opacity: .5,
+            color: "orange",
+            //color:getColor(feature.properties.League),
+            //fillColor:  getColor(feature.properties.League),
+            fillOpacity: 0.8
+
+            });  //.bindTooltip(feature.properties.Name);
+        //marker.addTo(img360_markers);
+        return marker
+        },
+});
+
+export var searchGroup = L.featureGroup([projects_layer, personal_doms, doms_layer]);
 
 export const mapLayers = [
     {
@@ -136,12 +156,18 @@ export const mapLayers = [
         baseLayerControl: true,
         title: "OSM",
     },
-/*    {
-        layer: img360_layer,
+    {
+        layer: project_tracks,
+        eventType: "tracks",
+        overlayLayerControl: true,
+        title: "Projects",
+    },
+    {
+        layer: photo_spheres,
         eventType: "img360",
         overlayLayerControl: true,
         title: "Photospheres",
-    },*/
+    },
     {
         layer: doms_layer,
         eventType: "DOMs",
@@ -157,12 +183,6 @@ export const mapLayers = [
     {
         layer: projects_layer,
         eventType: "projects",
-        overlayLayerControl: true,
-        title: "Projects",
-    },
-    {
-        layer: project_tracks,
-        eventType: "tracks",
         overlayLayerControl: true,
         title: "Projects",
     },
@@ -237,7 +257,13 @@ function updateSketchfabDivTag( divTag, properties) {
 
 function updateImg360DivTag( divTag, properties) {
     $( divTag + "-title").html( "Photosphere" )
-    $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
+    $( divTag + "-content" ).html(
+        '<center>Copyright and use policy:<br><a href="https://doi.org/10.5281/zenodo.' + properties.doi+'" target=blank>' +
+        '<img src="https://zenodo.org/badge/DOI/10.5281/zenodo.'+properties.doi+'.svg" alt="DOI"></a></center>' +
+        '<center>' +
+        '<a href="https://zenodo.org/record/' + properties.doi+'/files/'+ properties.uid + '.jpg?download=1' + '" target=_blank>Download Full Resolution </a>' +
+        '<br>' +
+    '<br><div class="sketchfab-embed-wrapper"> <iframe style="width:100%;height:90%;position:absolute;left:0px;top:100px;" width=100% <iframe width="100%" height="150%" allowfullscreen style="border-style:none;"'+
     ' src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama='+properties.api_link+'&autoLoad=false"></iframe></div>')
 }
 
