@@ -242,7 +242,7 @@ function updateV3geoDivTag( divTag, properties) {
     $( divTag + "-title").html( "Digital outcrop model" )
     $( divTag + "-content" ).html(
         '<br><div> <iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;'+
-        '" title="Piz Laviner - Err detachment system | V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
+        '" title="V3Geo" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
         'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
         'execution-while-not-rendered web-share src="https://v3geo.com/viewer/index.html#/' + properties.v3geo_id + '"></iframe></div>')
 }
