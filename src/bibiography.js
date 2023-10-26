@@ -34,7 +34,6 @@ export function generateBibliography () {
     var education = new Cite()
 
     education.set(data)
-    console.log(education)
 
     $('#education-list').html(education.format('bibliography', { format: 'html', template: 'geology', nosort: true }))
 
@@ -48,7 +47,6 @@ export function generateBibliography () {
     var popscience = new Cite()
 
     popscience.set(data)
-    console.log(popscience)
 
     $('#popscience-list').html(popscience.format('bibliography', { format: 'html', template: 'geology', nosort: true }))
 }
