@@ -8,8 +8,51 @@ export function loadSidebarPages () {
         $( "#events" ).load( "./pages/events.html" );
         $( "#grants" ).load( "./pages/grants.html" )
         generateFundingPage2()
+        generateCitationsBarPlot()
         
 //       $( "#publications" ).load( "./pages/publications.html" ); // automatically refreshed.
+}
+
+function generateCitationsBarPlot () {
+        let url = 'https://raw.githubusercontent.com/PeterBetlem/Serpapi/82d71ea3d8cbe71740a9b013ff5a26c6b8f21236/GScholargraph.json';
+
+        $.getJSON(url, function(data) {
+          var xValue = Object.keys(data);
+          var yValue = Object.values(data);
+          
+          var trace1 = {
+            x: xValue,
+            y: yValue,
+            type: 'bar',
+            name: 'citations',
+            marker: {
+              color: 'rgb(49,130,189)',
+              opacity: 0.7,
+              },
+          width: 'auto',
+          hoverinfo: 'none',
+          text: yValue.map(String),
+          textposition: 'auto'
+            };
+          var data = [trace1];
+          var layout = {
+            title: 'Google Scholar Citations',
+            xaxis: {
+              tickangle: -45
+              },
+              height: 250,
+              width: 400,
+              margin: {
+                l: 25,
+                r: 25,
+                t: 50,
+                b: 50
+              }
+            };
+        
+          Plotly.newPlot('publications-graph-scholar', data, layout, {staticPlot: true});
+        }         );
+
 }
 
 function generateFundingPage () {

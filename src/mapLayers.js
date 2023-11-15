@@ -85,7 +85,7 @@ const projects_layer = L.geoJson(null, {
 
 const personal_doms = L.geoJson(null, {
     style: domStyleOptions,
-    onEachFeature: onEachFeatureClosure("v3geo"),
+    onEachFeature: onEachFeatureClosure("pdom"),
     id: "doms"
     });
 
@@ -208,6 +208,13 @@ function onEachFeatureClosure(data_type) {
                     sidebar.enablePanel('events');
                     sidebar.open("events")
                     break
+                case "pdom":
+                    updateSketchfabPDivTag("#events", feature.properties)
+                    $( "#events-content" ).html()
+                    
+                    sidebar.enablePanel('events');
+                    sidebar.open("events")
+                    break
                 case "v3geo":
                     updateV3geoDivTag("#events", feature.properties)
                     sidebar.enablePanel('events');
@@ -252,10 +259,23 @@ function updateV3geoDivTag( divTag, properties) {
 
 function updateSketchfabDivTag( divTag, properties) {
     $( divTag + "-title").html( "Digital outcrop model" )
-    $( divTag + "-content" ).html('<br><div class="sketchfab-embed-wrapper"> '+
-    '<iframe style="width:100%;height:95%;position:absolute;left:0px;top:44px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
+    $( divTag + "-content" ).html('<center>Copyright and use policy:<br><a href="https://doi.org/' + properties.data_doi+'" target=blank>' +
+    'https://doi.org/' + properties.data_doi+'</a></center>'+
+    '<br><div class="sketchfab-embed-wrapper"> '+
+    '<iframe style="width:100%;height:90%;position:absolute;left:0px;top:90px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
     'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
     'execution-while-not-rendered web-share src="https://sketchfab.com/models/' + properties.publ_sketchfab_id + '/embed"></iframe></div>')
+}
+
+function updateSketchfabPDivTag( divTag, properties) {
+    console.log(properties)
+    $( divTag + "-title").html( "Digital outcrop model" )
+    $( divTag + "-content" ).html('<center>Copyright and use policy:<br><a href="https://doi.org/' + properties.doi+'" target=blank>' +
+    'https://doi.org/' + properties.doi+'</a></center>'+
+    '<br><div class="sketchfab-embed-wrapper"> '+
+    '<iframe style="width:100%;height:90%;position:absolute;left:0px;top:90px;" width=100% frameborder="0" allowfullscreen mozallowfullscreen="true" '+
+    'webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport '+
+    'execution-while-not-rendered web-share src="https://sketchfab.com/models/' + properties.publishing.mesh.sketchfab + '/embed"></iframe></div>')
 }
 
 function updateImg360DivTag( divTag, properties) {
